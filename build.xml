@@ -2239,4 +2239,29 @@ ${antunit.reports}
     </dn:wix>
   </target>
 
+
+  <!-- The location to the `dcover` executable -->
+  <property name="dcover-executable"
+    value="/path/to/dcover"/>
+
+  <path id="test.classpath">
+    <pathelement path="${build.classes}"/>
+    <path refid="classpath"/>
+    <path refid="tests-classpath"/>
+  </path>
+
+  <property name="test.dir" value="src/tests/junit"/>
+
+  <target name="dcover-create" depends="compile">
+    <exec executable="${dcover-executable}">
+      <arg value="create"/>
+      <arg value="--classpath=${toString:test.classpath}"/>
+      <arg value="--batch"/>
+      <arg value="--test-output-dir=${test.dir}"/>
+      <arg value="--testing-framework=junit-4"/>
+      <arg value="--disable-service"/>
+      <arg value="org.apache.tools.ant.util"/>
+    </exec>
+  </target>
+
 </project>
