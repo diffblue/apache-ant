@@ -22,6 +22,7 @@ import org.apache.tools.ant.types.Resource;
 import org.apache.tools.ant.types.ResourceCollection;
 import org.apache.tools.ant.types.resources.PropertyResource;
 import org.apache.tools.ant.types.resources.StringResource;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ScriptRunnerBaseDiffblueTest {
@@ -413,6 +414,7 @@ public class ScriptRunnerBaseDiffblueTest {
    * Method under test: {@link ScriptRunnerBase#replaceContextLoader()}
    */
   @Test
+  @Ignore
   public void testReplaceContextLoader() {
     // Arrange
     ScriptRunner scriptRunner = new ScriptRunner();

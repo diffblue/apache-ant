@@ -14,6 +14,7 @@ import org.apache.ant.antunit.LogContent;
 import org.apache.tools.ant.types.Resource;
 import org.apache.tools.ant.types.optional.xz.XzResource;
 import org.apache.tools.ant.types.resources.FileResource;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class PermissionUtilsDiffblueTest {
@@ -74,6 +75,7 @@ public class PermissionUtilsDiffblueTest {
    * Method under test: {@link PermissionUtils#getPermissions(Resource, Function)}
    */
   @Test
+  @Ignore
   public void testGetPermissions2() throws IOException {
     // Arrange and Act
     Set<PosixFilePermission> actualPermissions = PermissionUtils

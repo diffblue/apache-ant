@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import org.apache.tools.ant.BuildException;
 import org.jruby.util.io.NullChannel;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class FileUtilsDiffblueTest {
@@ -391,6 +392,7 @@ public class FileUtilsDiffblueTest {
    * Method under test: {@link FileUtils#getRelativePath(File, File)}
    */
   @Test
+  @Ignore
   public void testGetRelativePath2() throws Exception {
     // Arrange
     File fromFile = Paths.get(System.getProperty("/"), "test.txt").toFile();
@@ -882,6 +884,7 @@ public class FileUtilsDiffblueTest {
    * Method under test: {@link FileUtils#toVMSPath(File)}
    */
   @Test
+  @Ignore
   public void testToVMSPath() {
     // Arrange
     FileUtils fileUtils = FileUtils.getFileUtils();
@@ -943,6 +946,7 @@ public class FileUtilsDiffblueTest {
    * Method under test: {@link FileUtils#toVMSPath(File)}
    */
   @Test
+  @Ignore
   public void testToVMSPath5() {
     // Arrange
     FileUtils fileUtils = FileUtils.getFileUtils();
