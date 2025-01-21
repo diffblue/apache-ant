@@ -16,7 +16,19 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
-<project name="apache-ant" default="main" basedir=".">
+<project name="apache-ant" default="main" basedir="."
+         xmlns:cover="antlib:com.diffblue.buildsystem.cover.ant"
+         xmlns:jacoco="antlib:org.jacoco.ant">
+
+  <taskdef uri="antlib:com.diffblue.buildsystem.cover.ant" resource="com/diffblue/cover/buildsystem/ant/antlib.xml">
+    <classpath
+        path="/Users/paulcrane/projects/cover/cover-buildsystem-ant/target/cover-buildsystem-ant-2025.01.02-SNAPSHOT-jar-with-dependencies.jar"/>
+  </taskdef>
+  <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+    <classpath path="/Users/paulcrane/projects/ant-task-playground/single-ivy/ivy/org.jacoco.ant-0.8.8.jar"/>
+  </taskdef>
+
+  <cover:installListener/>
 
   <!-- Give user a chance to override without editing this file
        (and without typing -D on each invocation) -->
@@ -29,6 +41,7 @@
          Set the properties that control names and versions
        ===================================================================
   -->
+  <antversion property="ant.version"/>
   <property name="Name" value="Apache Ant"/>
   <property name="name" value="ant"/>
   <!-- this is the directory corresponding to groupId of Ant in the Maven repository -->
@@ -702,6 +715,47 @@
       </fileset>
     </copy>
   </target>
+
+
+  <target name="info" depends="compile">
+    <cover:projectModule>
+      <!-- Required for correct presentation of the project in CLI output -->
+      <cover:moduleName>${name}</cover:moduleName>
+
+      <!-- Suggested for correct presentation of the project in CLI output -->
+      <cover:version>1.10.15</cover:version>
+
+      <!-- Required for creating tests -->
+      <cover:location location="${basedir}"/>
+      <cover:classpath>
+        <path refid="tests-runtime-classpath"/>
+      </cover:classpath>
+
+      <cover:productionClasses location="${build.classes}"/>
+      <cover:productionSources location="${java.dir}"/>
+
+      <cover:testSources location="${src.junit}"/>
+      <cover:testClasses location="${build.tests}"/>
+
+      <!-- Suggested for creating tests, not mandatory as Cover assumes sensible default values -->
+      <cover:complianceLevel>${javac.target}</cover:complianceLevel>
+      <cover:encoding>UTF-8</cover:encoding>
+      <cover:junitReport location="${build.junit.xml}"/>
+
+      <!-- Required for coverage-reports -->
+      <cover:buildDirectory location="${build.dir}"/>
+      <cover:jacocoReport location="${build.dir}/jacoco.xml"/>
+      <cover:jacocoDestFile location="${build.dir}/jacoco.exec"/>
+
+      <!-- Suggested for coverage reports, not mandatory as Cover assumes sensible default values -->
+      <cover:jacocoFormats>xml</cover:jacocoFormats>
+
+      <!-- Optional, if there are submodules, specify them here as a list of projectModule configurations -->
+      <cover:submodules/>
+
+    </cover:projectModule>
+  </target>
+
 
   <target name="compile" depends="prepare">
     <mkdir dir="${build.classes}"/>
@@ -1770,48 +1824,50 @@ ${antunit.reports}
         <property name="ant.junit.failureCollector"
                   value="${junit.collector.dir}/${junit.collector.class}"/>
         <!-- TODO includeantruntime="false" does not solve "multiple versions of ant detected in path for junit" warning -->
-        <junit printsummary="${junit.summary}"
-               haltonfailure="${test.haltonfailure}"
-               fork="${junit.fork}"
-               forkmode="${junit.forkmode}"
-               threads="${junit.threads}"
-               tempdir="${build.dir}"
-               failureproperty="junit.failed"
-               errorproperty="junit.failed"
-               filtertrace="${junit.filtertrace}">
-          <sysproperty key="ant.home" value="${ant.home}"/>
-          <sysproperty key="build.classes.value" value="${build.classes.value}"/>
-          <sysproperty key="build.tests.value" value="${build.tests.value}"/>
-          <sysproperty key="offline" value="${offline}"/>
-          <sysproperty key="tests-classpath.value"
-                       value="${toString:tests-runtime-classpath}"/>
-          <sysproperty key="root" file="${basedir}"/>
-          <sysproperty key="build.compiler" value="${build.compiler}"/>
-          <sysproperty key="tests.and.ant.share.classloader"
-                       value="${tests.and.ant.share.classloader}"/>
-          <sysproperty key="java.io.tmpdir" file="${build.junit.tmpdir}"/>
-          <!-- in Java8 the canonical cache seems to interfere with
-               our symlink tests -->
-          <syspropertyset>
-            <propertyref name="sun.io.useCanonCaches"/>
-          </syspropertyset>
-          <classpath>
-            <path refid="tests-runtime-classpath"/>
-            <pathelement location="${junit.collector.dir}"/>
+        <jacoco:coverage destfile="${build.dir}/jacoco.exec">
+          <junit printsummary="${junit.summary}"
+                 haltonfailure="${test.haltonfailure}"
+                 fork="${junit.fork}"
+                 forkmode="${junit.forkmode}"
+                 threads="${junit.threads}"
+                 tempdir="${build.dir}"
+                 failureproperty="junit.failed"
+                 errorproperty="junit.failed"
+                 filtertrace="${junit.filtertrace}">
+            <sysproperty key="ant.home" value="${ant.home}"/>
+            <sysproperty key="build.classes.value" value="${build.classes.value}"/>
+            <sysproperty key="build.tests.value" value="${build.tests.value}"/>
+            <sysproperty key="offline" value="${offline}"/>
+            <sysproperty key="tests-classpath.value"
+                         value="${toString:tests-runtime-classpath}"/>
+            <sysproperty key="root" file="${basedir}"/>
+            <sysproperty key="build.compiler" value="${build.compiler}"/>
+            <sysproperty key="tests.and.ant.share.classloader"
+                         value="${tests.and.ant.share.classloader}"/>
+            <sysproperty key="java.io.tmpdir" file="${build.junit.tmpdir}"/>
+            <!-- in Java8 the canonical cache seems to interfere with
+                 our symlink tests -->
+            <syspropertyset>
+              <propertyref name="sun.io.useCanonCaches"/>
+            </syspropertyset>
+            <classpath>
+              <path refid="tests-runtime-classpath"/>
+              <pathelement location="${junit.collector.dir}"/>
+              <!-- FIXME: remove failure collector build code for the moment
+                   <path refid="failure.cp"/>
+              -->
+            </classpath>
             <!-- FIXME: remove failure collector build code for the moment
                  <path refid="failure.cp"/>
             -->
-          </classpath>
-          <!-- FIXME: remove failure collector build code for the moment
-               <formatter type="failure" usefile="false"/>
-          -->
-          <formatter type="xml"/>
-          <jvmarg line="${test.junit.vmargs}"/>
-          <!-- FIXME: remove failure collector build code for the moment
-               <test name="${junit.collector.class}" if="hasFailingTests"/>
-          -->
-          <junit-nested/>
-        </junit>
+            <formatter type="xml"/>
+            <jvmarg line="${test.junit.vmargs}"/>
+            <!-- FIXME: remove failure collector build code for the moment
+                 <test name="${junit.collector.class}" if="hasFailingTests"/>
+            -->
+            <junit-nested/>
+          </junit>
+        </jacoco:coverage>
       </sequential>
     </macrodef>
 
@@ -2152,6 +2208,28 @@ ${antunit.reports}
     <length>
       <fileset dir="${antunit.xml}" includes="TEST-*.xml"/>
     </length>
+  </target>
+
+  <target name="jacocoreport" depends="run-tests">
+    <jacoco:report>
+
+      <executiondata>
+        <file file="${build.dir}/jacoco.exec"/>
+      </executiondata>
+
+      <structure name="Example Project">
+        <classfiles>
+          <fileset dir="${build.classes}"/>
+        </classfiles>
+        <sourcefiles encoding="UTF-8">
+          <fileset dir="${java.dir}"/>
+        </sourcefiles>
+      </structure>
+
+      <xml destfile="${build.dir}/jacoco.xml"/>
+      <html destdir="${build.dir}/report/coverage/"/>
+
+    </jacoco:report>
   </target>
 
   <!-- JetBrains builds need this target -->

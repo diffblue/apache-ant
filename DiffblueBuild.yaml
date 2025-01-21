@@ -1,0 +1,86 @@
+meta:
+  version: 1
+  toolName: ant
+
+cmd:
+  windows:
+    - ant
+  linux:
+    - ant
+  macos:
+    - ant
+
+global:
+  flags: ~
+  timeout: PT10M
+  plugins: ~
+
+phase:
+
+  info:
+    goals:
+      - name: ~
+        goal: info
+        flags: ~
+
+  launcher: ~
+
+  clean:
+    goals:
+      - name: ~
+        goal: clean
+        flags: ~
+
+  build:
+    goals:
+      - name: ~
+        goal: jar
+        flags: ~
+
+  test:
+    timeout: PT60M
+    goals:
+      - name: ~
+        goal: test
+        flags:
+          - ${DIFFBLUE_TEST_FILTER}
+    filter:
+      default: ~
+      neverDiffblue:
+        - -Djunit.excludes=**/*DiffblueTest.java
+      onlyDiffblue:
+        - -Djunit.includes=**/*DiffblueTest.java
+      named:
+        - -Djunit.includes=**/${DIFFBLUE_TEST_CLASS}.java
+
+  coverage:
+    timeout: PT60M
+    goals:
+      - name: ~
+        goal: clean
+        flags: ~
+      - name: ~
+        goal: jacocoreport
+        flags:
+          - ${DIFFBLUE_TEST_FILTER}
+    filter:
+      default: ~
+      neverDiffblue:
+        - -Djunit.excludes=**/*DiffblueTest.java
+      onlyDiffblue:
+        - -Djunit.includes=**/*DiffblueTest.java
+      named:
+        - -Djunit.includes=**/${DIFFBLUE_TEST_CLASS}.java
+
+  refactor:
+    goals: ~
+
+  validate:
+    goals:
+      - name: ~
+        goal: clean
+        flags: ~
+
+      - name: ~
+        goal: test
+        flags: ~
